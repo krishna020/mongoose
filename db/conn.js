@@ -1,6 +1,6 @@
 const mongoose=require('mongoose')
 let url='mongodb://127.0.0.1:27017/testing'
-mongoose.connect(url)
+mongoose.connect(url,{heartbeatFrequencyMS:10000})
 .then(()=>
 {
     console.log('database is connected');

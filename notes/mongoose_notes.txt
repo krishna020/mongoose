@@ -1,0 +1,9 @@
+/*
+#schema
+a schema typically refers to a structural blueprint or framework that outlines the organization 
+and definition of data within a database
+*/
+
+there are 2 type of schema_type
+1-build include
+2- manual

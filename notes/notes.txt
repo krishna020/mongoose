@@ -1,0 +1,175 @@
+const userDetails = await userModel.aggregate([{$match:{branch:"IT"}}])
+
+/*
+$group
+{
+    _id:expression,
+    field1:expression,
+    field2:expression
+}
+*/
+
+const userDetails = await userModel.aggregate([{$group:{_id:'$branch',minAge:{$min:'$age'},}}])
+
+//........................................
+const userDetails = await userModel.aggregate([{ 
+            $group: { _id: '$branch',
+            minAge: { $min: '$age' },
+            name: { $first: '$name' } 
+        } 
+        }
+        ])
+
+        //.............................if you want to all details  then use $$ROOT
+        const userDetails = await userModel.aggregate([{ 
+            $group: { _id: '$branch',
+            minAge: { $min: '$age' },
+            Full_details: { $push: '$$ROOT' } 
+        } 
+        }
+        ])
+
+        //...................................
+            const userDetails = await userModel.aggregate([
+            { $match: { 
+                gender: 'female' } 
+            },
+            {
+                $group: {
+                    _id: '$age',
+                    totalNumberOfMale: { $sum: 1 }
+                }
+            }
+        ])
+
+        //..........................................also group by ascending order.
+        const userDetails = await userModel.aggregate([
+            {
+                $match: {
+                    gender: 'female'
+                }
+            },
+            {
+                $group: {
+                    _id: '$age',
+                    totalNumberOfMale: { $sum: 1 }
+                }
+            },\
+            {
+                $sort: {
+                    totalNumberOfMale: 1
+                }
+            }.
+            {$group:{_id:null, maxNumberInAnAgeGroup:{$max:"$totalNumberOfMale"}}}
+        ])
+
+        //.................unwind open the array
+        const userDetails = await userModel.aggregate([
+            {
+                $unwind:'$hobbies'
+            },
+            {$group:{
+                _id:'$age',
+                hobbies:{$push:'$hobbies'}
+            }}
+        ])
+
+        //.......project
+        /*
+        project document use to reshape the document include or exclude the field and create computed field
+        const userDetails = await userModel.aggregate([
+           {
+            $project:{
+              name:1,
+              user_age:'$age'
+            }
+           }
+        ])
+        */
+
+        //.....................
+    const userDetails = await userModel.aggregate([
+            {
+                $match: {
+                    gender: 'female'
+                }
+            }, {
+                $group:
+                {
+                    _id: '$branch',
+                    minAgeOfHotBabe: {$min: {$min: '$age'}},
+                    name: {$last: '$name'},
+                    maxMarks: {$max: {$max: '$marks'}}}
+            },{
+                $project:{
+                    _id:0,
+                    maxMarks:1,
+                    minAgeOfHotBabe:1
+                }
+            },
+            {
+                $sort:{maxMarks:1}
+            }
+        ])
+
+        //...............................using switch case
+         {
+                $project: {
+                    branch: 1,
+                    age: 1,
+                    marks: 1,
+                },
+            },
+            {
+                $addFields: {
+                    ageGroup: {
+                        $switch: {
+                            branches: [
+                                { case: { $lte: ['$age', 30] }, then: 'Young' },
+                                { case: { $lte: ['$age', 50] }, then: 'Middle-aged' },
+                                { case: { $gte: ['$age', 51] }, then: 'Senior' },
+                            ],
+                            default: 'Unknown',
+                        },
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: { branch: '$branch', ageGroup: '$ageGroup' },
+                    totalStudents: { $sum: 1 },
+                    averageMarks: { $avg: { $avg: '$marks' } },
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    branch: '$_id.branch',
+                    ageGroup: '$_id.ageGroup',
+                    totalStudents: 1,
+                    averageMarks: { $round: ['$averageMarks', 2] },
+                },
+            },
+            { $sort: { branch: 1, ageGroup: 1 } },
+//............................................................year
+ {
+                $group: {
+                  _id: { $year: '$publishedDate' },
+                  avgPageCount: { $avg: '$pageCount' },
+                },
+              },
+              {
+                $project: {
+                  _id: 0,
+                  year: '$_id',
+                  avgPageCount: 1,
+                },
+              },
+              {
+                $sort: {
+                  year: 1,
+                },
+              },
+
+
+git rebase main/origin
